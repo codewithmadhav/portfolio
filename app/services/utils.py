@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+
 from app.models import Photo
 
 gallery_bp = Blueprint("gallery", __name__)

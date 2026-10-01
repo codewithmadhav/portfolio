@@ -1,5 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import relationship
 from app import db
 
 post_tags = db.Table(
@@ -16,19 +14,13 @@ class Category(db.Model):
     slug = db.Column(db.String(120), unique=True, nullable=False)
     posts = db.relationship("Post", back_populates="category")
 
-    def __repr__(self):
-        return f"<Category {self.name}>"
-
 
 class Tag(db.Model):
     __tablename__ = "tag"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     slug = db.Column(db.String(80), unique=True, nullable=False)
-    posts = db.relationship("Post", secondary=post_tags, back_populates="tags")
-
-    def __repr__(self):
-        return f"<Tag {self.name}>"
+    posts = db.relationship("Post", secondary=post_tags, back_populates="posts")
 
 
 class Post(db.Model):
@@ -45,10 +37,7 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
     category = db.relationship("Category", back_populates="posts")
-    tags = db.relationship("Tag", secondary=post_tags, back_populates="posts")
-
-    def __repr__(self):
-        return f"<Post {self.title}>"
+    tags = db.relationship("Tag", secondary=post_tags, back_populates="tags")
 
 
 class Project(db.Model):
@@ -65,9 +54,6 @@ class Project(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
-    def __repr__(self):
-        return f"<Project {self.title}>"
-
 
 class Photo(db.Model):
     __tablename__ = "photo"
@@ -79,9 +65,6 @@ class Photo(db.Model):
     featured = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    def __repr__(self):
-        return f"<Photo {self.title}>"
-
 
 class ContactMessage(db.Model):
     __tablename__ = "contact_message"
@@ -92,9 +75,6 @@ class ContactMessage(db.Model):
     message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    def __repr__(self):
-        return f"<ContactMessage {self.email}>"
-
 
 class SiteSetting(db.Model):
     __tablename__ = "site_setting"
@@ -102,6 +82,3 @@ class SiteSetting(db.Model):
     key = db.Column(db.String(80), unique=True, nullable=False)
     value = db.Column(db.String(300), nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
-
-    def __repr__(self):
-        return f"<SiteSetting {self.key}>"

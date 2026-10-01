@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if photo %}Edit Photo{% else %}New Photo{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container section-spacing admin-shell">
+  <div class="section-heading">
+    <p class="eyebrow">Photography</p>
+    <h1>{% if photo %}Edit Photo{% else %}Upload Photo{% endif %}</h1>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="admin-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <label>Title<input type="text" name="title" value="{{ photo.title if photo else '' }}" required /></label>
+    <label>Caption<textarea name="caption" rows="3">{{ photo.caption if photo else '' }}</textarea></label>
+    <label>Album<input type="text" name="album" value="{{ photo.album if photo else 'General' }}" /></label>
+    <label>Image<input type="file" name="image" /></label>
+    <button type="submit" class="btn btn-primary">Save Photo</button>
+  </form>
+</div>
+{% endblock %}

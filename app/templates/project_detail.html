@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ config['SITE_NAME'] }} | Data Science & AI/ML Engineer{% endblock %}
+
+{% block content %}
+<section class="hero container section-spacing">
+  <div class="hero-copy reveal">
+    <p class="eyebrow">Data Science & AI/ML Engineer</p>
+    <h1>Hi, I'm {{ config['SITE_NAME'] }}.</h1>
+    <p class="hero-subtitle">I build thoughtful AI systems, machine learning workflows, and data-driven products with a strong focus on real-world impact.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#projects">View Projects</a>
+      <a class="btn btn-secondary" href="#contact">Contact Me</a>
+    </div>
+    <div class="social-row">
+      <a href="{{ config['GITHUB_URL'] }}" target="_blank" rel="noreferrer" aria-label="GitHub">GitHub</a>
+      <a href="{{ config['LINKEDIN_URL'] }}" target="_blank" rel="noreferrer" aria-label="LinkedIn">LinkedIn</a>
+      <a href="{{ config['INSTAGRAM_URL'] }}" target="_blank" rel="noreferrer" aria-label="Instagram">Instagram</a>
+      <a href="{{ config['TWITTER_URL'] }}" target="_blank" rel="noreferrer" aria-label="X">X/Twitter</a>
+    </div>
+  </div>
+  <div class="hero-visual reveal">
+    <div class="profile-card">
+      <div class="profile-image-wrap">
+        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80" alt="Profile portrait" />
+      </div>
+      <div class="profile-badges">
+        <span>Python</span>
+        <span>ML</span>
+        <span>GenAI</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="container section-spacing reveal">
+  <div class="section-heading">
+    <p class="eyebrow">About Me</p>
+    <h2>Building intelligent systems with clear thinking.</h2>
+  </div>
+  <div class="about-grid">
+    <div>
+      <p>
+        I’m a Data Science & AI/ML Engineer student passionate about turning messy data into systems that are useful, measurable, and production-ready.
+      </p>
+      <p>
+        My work sits at the intersection of Python, machine learning, deep learning, and practical AI engineering — from model experimentation to deployment-ready workflows.
+      </p>
+    </div>
+    <div class="mini-panel">
+      <ul>
+        <li>Python & Data Engineering</li>
+        <li>Machine Learning & Deep Learning</li>
+        <li>Generative AI & AI Engineering</li>
+        <li>Flask, SQL, Git, Docker, Kubernetes</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="skills" class="container section-spacing reveal">
+  <div class="section-heading">
+    <p class="eyebrow">Skills</p>
+    <h2>Core tools and technical focus.</h2>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-group"><h3>Python Stack</h3><ul><li>Python</li><li>Data Science</li><li>Machine Learning</li><li>Deep Learning</li></ul></div>
+    <div class="skill-group"><h3>AI & GenAI</h3><ul><li>Generative AI</li><li>Prompt Engineering</li><li>AI Product Thinking</li><li>Evaluation Pipelines</li></ul></div>
+    <div class="skill-group"><h3>Data & Systems</h3><ul><li>SQL</li><li>Flask</li><li>Git & GitHub</li><li>Docker</li></ul></div>
+    <div class="skill-group"><h3>Web & Infra</h3><ul><li>HTML/CSS/JavaScript</li><li>Kubernetes</li><li>API Design</li><li>Deployment</li></ul></div>
+  </div>
+</section>
+
+<section id="projects" class="container section-spacing reveal">
+  <div class="section-heading project-heading">
+    <div>
+      <p class="eyebrow">Featured Projects</p>
+      <h2>Selected work across AI, data, and product.</h2>
+    </div>
+    <a href="/projects" class="text-link">View all</a>
+  </div>
+  <div class="project-grid">
+    {% for project in featured_projects %}
+    <article class="project-card">
+      <div class="project-image-wrap">
+        <img src="{{ project.image_url }}" alt="{{ project.title }}" loading="lazy" />
+      </div>
+      <div class="project-body">
+        <h3>{{ project.title }}</h3>
+        <p>{{ project.short_description }}</p>
+        <div class="chip-row">
+          <span>Python</span>
+          <span>AI</span>
+          <span>ML</span>
+        </div>
+        <div class="card-actions">
+          <a href="{{ project.github_url }}" class="btn btn-secondary small" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="/projects/{{ project.slug }}" class="btn btn-primary small">Details</a>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container section-spacing reveal">
+  <div class="section-heading">
+    <p class="eyebrow">Learning Journey</p>
+    <h2>From experimentation to implementation.</h2>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item">
+      <span class="year">2022</span>
+      <div>
+        <h3>Python & Data Foundations</h3>
+        <p>Focused on Python, data wrangling, SQL, and strong analytical fundamentals.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <span class="year">2023</span>
+      <div>
+        <h3>ML & Deep Learning</h3>
+        <p>Explored supervised learning, model evaluation, neural networks, and practical deployment thinking.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <span class="year">2024</span>
+      <div>
+        <h3>Generative AI & AI Engineering</h3>
+        <p>Studied LLM workflows, prompt design, MLOps foundations, and product-oriented AI systems.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container section-spacing reveal">
+  <div class="section-heading project-heading">
+    <div>
+      <p class="eyebrow">Blog</p>
+      <h2>Recent writing and ideas.</h2>
+    </div>
+    <a href="{{ url_for('blog.blog_index') }}" class="text-link">Explore all posts</a>
+  </div>
+  <div class="blog-preview-grid">
+    {% for post in recent_posts %}
+    <article class="blog-card">
+      <img src="{{ post.featured_image }}" alt="{{ post.title }}" loading="lazy" />
+      <div class="blog-card-body">
+        <span class="post-meta">{{ post.category.name }} · {{ post.created_at.strftime('%b %d, %Y') }}</span>
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.summary }}</p>
+        <a href="{{ url_for('blog.blog_detail', slug=post.slug) }}" class="text-link">Read article</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container section-spacing reveal">
+  <div class="section-heading project-heading">
+    <div>
+      <p class="eyebrow">Photography</p>
+      <h2>Frames from daily life and travel.</h2>
+    </div>
+    <a href="{{ url_for('gallery.gallery_index') }}" class="text-link">Open gallery</a>
+  </div>
+  <div class="photo-grid-compact">
+    {% for photo in gallery_preview %}
+    <figure class="photo-card">
+      <img src="{{ photo.image_url }}" alt="{{ photo.title }}" loading="lazy" />
+    </figure>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container section-spacing reveal">
+  <div class="section-heading">
+    <p class="eyebrow">Achievements</p>
+    <h2>Learning milestones and credentials.</h2>
+  </div>
+  <div class="achievement-grid">
+    <div class="achievement-card">
+      <span class="achievement-tag">AI</span>
+      <h3>Applied Machine Learning</h3>
+      <p>Focused on building practical ML systems with evaluation and deployment discipline.</p>
+    </div>
+    <div class="achievement-card">
+      <span class="achievement-tag">Cloud</span>
+      <h3>Container & Workflow Practice</h3>
+      <p>Using Docker, GitHub workflows, and infrastructure concepts in real projects.</p>
+    </div>
+    <div class="achievement-card">
+      <span class="achievement-tag">Research</span>
+      <h3>Deep Learning Exploration</h3>
+      <p>Studying model design, optimization, and data-centric decision making.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container section-spacing reveal">
+  <div class="section-heading">
+    <p class="eyebrow">Developer Activity</p>
+    <h2>Recent focus and technical habits.</h2>
+  </div>
+  <div class="activity-panel">
+    <div class="activity-row"><span>GitHub</span><strong>Open-source experiments and portfolio work</strong></div>
+    <div class="activity-row"><span>Projects</span><strong>ML dashboards, AI workflows, and data products</strong></div>
+    <div class="activity-row"><span>Stack</span><strong>Python, Flask, SQL, Docker, Kubernetes, AI tooling</strong></div>
+    <div class="activity-row"><span>Current focus</span><strong>Generative AI systems and practical ML operations</strong></div>
+  </div>
+</section>
+
+<section id="contact" class="container section-spacing reveal">
+  <div class="section-heading">
+    <p class="eyebrow">Contact</p>
+    <h2>Let’s build something meaningful.</h2>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-card">
+      <p>Email me directly at <a href="mailto:{{ config['SITE_EMAIL'] }}">{{ config['SITE_EMAIL'] }}</a></p>
+      <p>Available for AI engineering, data science projects, product experimentation, and personal collaborations.</p>
+    </div>
+    <form class="contact-form" method="post" action="{{ url_for('contact.contact_form') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off" />
+      <div class="field-row">
+        <label>
+          Name
+          <input type="text" name="name" required />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" required />
+        </label>
+      </div>
+      <label>
+        Subject
+        <input type="text" name="subject" required />
+      </label>
+      <label>
+        Message
+        <textarea name="message" rows="6" required></textarea>
+      </label>
+      <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

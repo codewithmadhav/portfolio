@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Photography | {{ config['SITE_NAME'] }}{% endblock %}
+
+{% block content %}
+<div class="container section-spacing gallery-shell">
+  <div class="section-heading project-heading">
+    <div>
+      <p class="eyebrow">Photography</p>
+      <h1>Visual stories and everyday frames.</h1>
+    </div>
+  </div>
+
+  <div class="category-row">
+    <a href="{{ url_for('gallery.gallery_index') }}" class="tag-pill {% if not selected_album %}active{% endif %}">All</a>
+    {% for album in albums %}
+      <a href="{{ url_for('gallery.gallery_index', album=album) }}" class="tag-pill {% if selected_album == album %}active{% endif %}">{{ album }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="gallery-grid">
+    {% for photo in photos %}
+      <figure class="gallery-item">
+        <img src="{{ photo.image_url }}" alt="{{ photo.title }}" loading="lazy" />
+        <figcaption>
+          <strong>{{ photo.title }}</strong>
+          <span>{{ photo.caption }}</span>
+        </figcaption>
+      </figure>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

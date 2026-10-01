@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_listing %}Projects | {{ config['SITE_NAME'] }}{% else %}{{ project.title }} | {{ config['SITE_NAME'] }}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container section-spacing page-shell">
+  {% if is_listing %}
+    <div class="section-heading">
+      <p class="eyebrow">Projects</p>
+      <h1>Selected product and AI work.</h1>
+    </div>
+    <div class="project-grid">
+      {% for project in projects %}
+      <article class="project-card">
+        <div class="project-image-wrap">
+          <img src="{{ project.image_url }}" alt="{{ project.title }}" loading="lazy" />
+        </div>
+        <div class="project-body">
+          <h3>{{ project.title }}</h3>
+          <p>{{ project.short_description }}</p>
+          <div class="card-actions">
+            <a href="{{ project.github_url }}" class="btn btn-secondary small" target="_blank" rel="noreferrer">GitHub</a>
+            <a href="/projects/{{ project.slug }}" class="btn btn-primary small">Details</a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <article class="project-detail">
+      <img src="{{ project.image_url }}" alt="{{ project.title }}" class="detail-hero" />
+      <div class="detail-copy">
+        <p class="eyebrow">Project Detail</p>
+        <h1>{{ project.title }}</h1>
+        <p>{{ project.short_description }}</p>
+        <div class="card-actions detail-actions">
+          {% if project.github_url %}<a href="{{ project.github_url }}" target="_blank" rel="noreferrer" class="btn btn-secondary">GitHub</a>{% endif %}
+          {% if project.live_url %}<a href="{{ project.live_url }}" target="_blank" rel="noreferrer" class="btn btn-primary">Live Demo</a>{% endif %}
+        </div>
+        <div class="project-description">
+          <p>{{ project.description }}</p>
+        </div>
+      </div>
+    </article>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if post %}Edit Post{% else %}New Post{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container section-spacing admin-shell">
+  <div class="section-heading">
+    <p class="eyebrow">Blog</p>
+    <h1>{% if post %}Edit Post{% else %}Create Post{% endif %}</h1>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="admin-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <label>Title<input type="text" name="title" value="{{ post.title if post else '' }}" required /></label>
+    <label>Summary<textarea name="summary" rows="3" required>{{ post.summary if post else '' }}</textarea></label>
+    <label>Content<textarea name="content" rows="12" required>{{ post.content if post else '' }}</textarea></label>
+
+    <div class="field-row">
+      <label>Category
+        <select name="category_id">
+          {% for category in categories %}
+            <option value="{{ category.id }}" {% if post and post.category_id == category.id %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Featured Image<input type="file" name="featured_image" /></label>
+    </div>
+
+    <div class="check-row">
+      <label><input type="checkbox" name="featured" {% if post and post.featured %}checked{% endif %} /> Featured</label>
+      <label><input type="checkbox" name="published" {% if not post or post.published %}checked{% endif %} /> Publish</label>
+    </div>
+
+    <label>Tags
+      <div class="tag-select-grid">
+        {% for tag in tags %}
+          <label><input type="checkbox" name="tags" value="{{ tag.id }}" {% if post and tag in post.tags %}checked{% endif %} /> {{ tag.name }}</label>
+        {% endfor %}
+      </div>
+    </label>
+
+    <button type="submit" class="btn btn-primary">Save Post</button>
+  </form>
+</div>
+{% endblock %}

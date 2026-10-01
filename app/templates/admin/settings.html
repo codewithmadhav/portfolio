@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="container section-spacing admin-shell">
+  <div class="section-heading project-heading">
+    <div>
+      <p class="eyebrow">Inbox</p>
+      <h1>Contact Messages</h1>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary small">Back to dashboard</a>
+  </div>
+
+  {% for message in messages %}
+    <div class="message-card">
+      <p><strong>{{ message.name }}</strong> · {{ message.email }}</p>
+      <p><strong>Subject:</strong> {{ message.subject }}</p>
+      <p>{{ message.message }}</p>
+      <small>{{ message.created_at.strftime('%b %d, %Y') }}</small>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

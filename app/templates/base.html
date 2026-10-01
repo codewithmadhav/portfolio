@@ -1,0 +1,222 @@
+import os
+from datetime import datetime
+
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
+from sqlalchemy import func
+from werkzeug.security import check_password_hash
+from werkzeug.utils import secure_filename
+
+from app import db
+from app.models import Category, ContactMessage, Photo, Post, Project, Tag, SiteSetting
+from app.services.utils import get_setting, set_setting, slugify
+
+admin_bp = Blueprint("admin", __name__, template_folder="../templates")
+
+
+@admin_bp.before_request
+def require_admin_login():
+    if request.endpoint in ["admin.login", "admin.logout"]:
+        return None
+    if not session.get("admin_authenticated"):
+        return redirect(url_for("admin.login"))
+
+
+@admin_bp.route("/login", methods=["GET", "POST"])
+def login():
+    if session.get("admin_authenticated"):
+        return redirect(url_for("admin.dashboard"))
+
+    if request.method == "POST":
+        username = request.form.get("username", "")
+        password = request.form.get("password", "")
+        expected_username = current_app.config.get("ADMIN_USERNAME", "admin")
+        expected_hash = current_app.config.get("ADMIN_PASSWORD_HASH")
+        expected_password = current_app.config.get("ADMIN_PASSWORD", "admin123")
+
+        valid = False
+        if username == expected_username:
+            if expected_hash:
+                valid = check_password_hash(expected_hash, password)
+            else:
+                valid = password == expected_password
+
+        if valid:
+            session["admin_authenticated"] = True
+            flash("Welcome back. You are now logged in.", "success")
+            return redirect(url_for("admin.dashboard"))
+
+        flash("Invalid username or password.", "error")
+
+    return render_template("admin/login.html")
+
+
+@admin_bp.route("/logout")
+def logout():
+    session.clear()
+    flash("You have been logged out.", "success")
+    return redirect(url_for("admin.login"))
+
+
+@admin_bp.route("/")
+def dashboard():
+    blog_count = Post.query.count()
+    contact_count = ContactMessage.query.count()
+    photo_count = Photo.query.count()
+    project_count = Project.query.count()
+    recent_messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).limit(5).all()
+    recent_posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
+    return render_template(
+        "admin/dashboard.html",
+        blog_count=blog_count,
+        contact_count=contact_count,
+        photo_count=photo_count,
+        project_count=project_count,
+        recent_messages=recent_messages,
+        recent_posts=recent_posts,
+    )
+
+
+@admin_bp.route("/posts/new", methods=["GET", "POST"])
+@admin_bp.route("/posts/<int:post_id>/edit", methods=["GET", "POST"])
+def post_form(post_id=None):
+    post = Post.query.get_or_404(post_id) if post_id else None
+    categories = Category.query.order_by(Category.name).all()
+    tags = Tag.query.order_by(Tag.name).all()
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        summary = request.form.get("summary", "").strip()
+        content = request.form.get("content", "").strip()
+        category_id = request.form.get("category_id")
+        featured = request.form.get("featured") == "on"
+        published = request.form.get("published") == "on"
+        tag_ids = request.form.getlist("tags")
+
+        if not title or not summary or not content or not category_id:
+            flash("Title, summary, content, and category are required.", "error")
+            return render_template("admin/blog_form.html", post=post, categories=categories, tags=tags)
+
+        if post is None:
+            post = Post()
+
+        post.title = title
+        post.slug = slugify(title)
+        post.summary = summary
+        post.content = content
+        post.featured = featured
+        post.published = published
+        post.category_id = int(category_id)
+
+        if request.files.get("featured_image") and request.files["featured_image"].filename:
+            file = request.files["featured_image"]
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+            file.save(file_path)
+            post.featured_image = f"/static/uploads/{filename}"
+
+        post.tags = []
+        for tag_id in tag_ids:
+            tag = Tag.query.get(int(tag_id))
+            if tag:
+                post.tags.append(tag)
+
+        db.session.add(post)
+        db.session.commit()
+        flash("Blog post saved successfully.", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/blog_form.html", post=post, categories=categories, tags=tags)
+
+
+@admin_bp.route("/posts/<int:post_id>/delete", methods=["POST"])
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    db.session.delete(post)
+    db.session.commit()
+    flash("Post deleted.", "success")
+    return redirect(url_for("admin.dashboard"))
+
+
+@admin_bp.route("/gallery/new", methods=["GET", "POST"])
+@admin_bp.route("/gallery/<int:photo_id>/edit", methods=["GET", "POST"])
+def photo_form(photo_id=None):
+    photo = Photo.query.get_or_404(photo_id) if photo_id else None
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        caption = request.form.get("caption", "").strip()
+        album = request.form.get("album", "General").strip()
+
+        if not title:
+            flash("Photo title is required.", "error")
+            return render_template("admin/gallery_form.html", photo=photo)
+
+        if photo is None:
+            photo = Photo()
+
+        photo.title = title
+        photo.caption = caption
+        photo.album = album or "General"
+
+        file = request.files.get("image")
+        if file and file.filename:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+            file.save(file_path)
+            photo.image_url = f"/static/uploads/{filename}"
+
+        db.session.add(photo)
+        db.session.commit()
+        flash("Photo saved successfully.", "success")
+        return redirect(url_for("admin.dashboard"))
+
+    return render_template("admin/gallery_form.html", photo=photo)
+
+
+@admin_bp.route("/gallery/<int:photo_id>/delete", methods=["POST"])
+def delete_photo(photo_id):
+    photo = Photo.query.get_or_404(photo_id)
+    db.session.delete(photo)
+    db.session.commit()
+    flash("Photo deleted.", "success")
+    return redirect(url_for("admin.dashboard"))
+
+
+@admin_bp.route("/messages")
+def messages():
+    messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
+    return render_template("admin/messages.html", messages=messages)
+
+
+@admin_bp.route("/settings", methods=["GET", "POST"])
+def settings():
+    if request.method == "POST":
+        for key in ["site_name", "site_email", "github_url", "linkedin_url", "instagram_url", "twitter_url"]:
+            value = request.form.get(key, "").strip()
+            record = SiteSetting.query.filter_by(key=key).first()
+            if record:
+                record.value = value
+            else:
+                db.session.add(SiteSetting(key=key, value=value))
+        db.session.commit()
+        flash("Site settings updated.", "success")
+        return redirect(url_for("admin.settings"))
+
+    data = {
+        "site_name": get_setting("site_name", "Madhav"),
+        "site_email": get_setting("site_email", "hello@example.com"),
+        "github_url": get_setting("github_url", "https://github.com/codewithmadhav"),
+        "linkedin_url": get_setting("linkedin_url", "https://www.linkedin.com"),
+        "instagram_url": get_setting("instagram_url", "https://www.instagram.com"),
+        "twitter_url": get_setting("twitter_url", "https://x.com"),
+    }
+    return render_template("admin/settings.html", settings=data)

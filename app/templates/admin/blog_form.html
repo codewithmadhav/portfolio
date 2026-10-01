@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container section-spacing admin-shell">
+  <div class="section-heading project-heading">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Dashboard</h1>
+    </div>
+    <div class="admin-links">
+      <a href="{{ url_for('admin.post_form') }}" class="btn btn-primary small">New Post</a>
+      <a href="{{ url_for('admin.photo_form') }}" class="btn btn-secondary small">New Photo</a>
+      <a href="{{ url_for('admin.settings') }}" class="btn btn-secondary small">Settings</a>
+      <a href="{{ url_for('admin.logout') }}" class="btn btn-secondary small">Logout</a>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><span>Posts</span><strong>{{ blog_count }}</strong></div>
+    <div class="stat-card"><span>Photos</span><strong>{{ photo_count }}</strong></div>
+    <div class="stat-card"><span>Messages</span><strong>{{ contact_count }}</strong></div>
+    <div class="stat-card"><span>Projects</span><strong>{{ project_count }}</strong></div>
+  </div>
+
+  <div class="admin-panels">
+    <section class="admin-panel">
+      <h3>Recent Posts</h3>
+      <ul>
+        {% for post in recent_posts %}
+          <li>
+            <span>{{ post.title }}</span>
+            <a href="{{ url_for('admin.post_form', post_id=post.id) }}">Edit</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="admin-panel">
+      <h3>Recent Messages</h3>
+      <ul>
+        {% for message in recent_messages %}
+          <li>
+            <span>{{ message.name }} · {{ message.subject }}</span>
+            <a href="{{ url_for('admin.messages') }}">View</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

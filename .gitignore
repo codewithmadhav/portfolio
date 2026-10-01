@@ -1,0 +1,13 @@
+# .gitignore
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+.venv/
+venv/
+instance/
+*.log
+.pytest_cache/
+.DS_Store
+app/static/uploads/*
+!app/static/uploads/.gitkeep
